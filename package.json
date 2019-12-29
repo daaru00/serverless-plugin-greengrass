@@ -1,0 +1,33 @@
+{
+  "name": "serverless-plugin-greengrass",
+  "version": "1.0.0",
+  "description": "Serverless plugin to deploy Greengrass functions",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/daaru00/serverless-plugin-greengrass.git"
+  },
+  "keywords": [
+    "serverless",
+    "aws",
+    "iot",
+    "greengrass"
+  ],
+  "author": "Fabio Gollinucci",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/daaru00/serverless-plugin-greengrass/issues"
+  },
+  "homepage": "https://github.com/daaru00/serverless-plugin-greengrass#readme",
+  "devDependencies": {
+    "eslint": "^5.16.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.19.1",
+    "eslint-plugin-node": "^8.0.1",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1"
+  },
+  "dependencies": {
+    "lodash": "^4.17.15"
+  }
+}
