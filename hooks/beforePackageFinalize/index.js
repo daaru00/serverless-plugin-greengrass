@@ -16,7 +16,6 @@ module.exports = {
     })
 
     // Add all functions
-    const accountInfo = await this.provider.getAccountInfo()
     const defaultConfig = this.config.defaults || {}
 
     this.logger.log('Loading functions...')
@@ -27,7 +26,15 @@ module.exports = {
       // Add function
       functionDefinition.addFunction({
         id: functionName,
-        functionArn: `arn:${accountInfo.partition}:lambda:${this.service.provider.region}:${accountInfo.accountId}:function:${functionObject.name}`,
+        functionArn: {
+          'Fn::Join': [
+            ':',
+            [
+              {'Fn::GetAtt': [ this.provider.naming.getLambdaLogicalId(functionName), 'Arn' ]},
+              {'Fn::GetAtt': [ functionObject.versionLogicalId, 'Version' ]}
+            ]
+          ]
+        },
         pinned: greengrassConfig.pinned || defaultConfig.pinned,
         executable: greengrassConfig.handler || functionObject.handler,
         memorySize: greengrassConfig.memory || defaultConfig.memory || functionObject.memory,

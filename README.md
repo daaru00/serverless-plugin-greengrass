@@ -97,3 +97,45 @@ Manually execute reset, with `autoDeploy` disabled:
 sls remove
 sls greengrass reset
 ```
+
+## Extra tips
+
+### Setup RaspberryPI
+
+- Download latest version of Raspbian Lite version from [official download page](https://www.raspberrypi.org/downloads/raspbian/)
+- Extract `.img` file from previously download zip archive
+- Build SD card using [Etcher](https://www.balena.io/etcher/), selecting previously extracted `.img` file
+- Mount `boot` partition created on SD card
+- Create a new file `wpa_supplicant.conf` with you WiFi credentials (edit info between `«`):
+```
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+country=«your_ISO-3166-1_two-letter_country_code»
+
+network={
+    ssid="«your_SSID»"
+    psk="«your_PSK»"
+    key_mgmt=WPA-PSK
+}
+```
+[source](https://raspberrypi.stackexchange.com/questions/10251/prepare-sd-card-for-wifi-on-headless-pi)
+
+- Create a new empty file `ssh` without extensions in order to enable SSH service
+- Insert SD card into RaspberryPI and boot it up
+- Check into your modem info page a WiFi newly connected device called "raspberry" and get the IP
+- Connect to Raspberry from your computer using SSH
+```bash
+ssh pi@<raspberry ip>
+```
+- Login using `raspberry` default password
+- Install and setup Greengrass:
+```bash
+export AWS_ACCESS_KEY_ID=«your_access_key»
+export AWS_SECRET_ACCESS_KEY=«your_secret_access_key»
+
+sudo su
+wget -q -O ./gg-device-setup-latest.sh https://d1onfpft10uf5o.cloudfront.net/greengrass-device-setup/downloads/gg-device-setup-latest.sh && chmod +x ./gg-device-setup-latest.sh && sudo -E ./gg-device-setup-latest.sh bootstrap-greengrass-interactive
+```
+[source](https://docs.aws.amazon.com/greengrass/latest/developerguide/quick-start.html)
+
+- Automatically starting AWS Greengrass on a Raspberry Pi on system boot using [this guide](http://www.andyfrench.info/2018/08/automatically-starting-aws-greengrass.html)

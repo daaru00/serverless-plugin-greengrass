@@ -14,7 +14,7 @@ module.exports = class FunctionDefinition {
    */
   addFunction({id, functionArn, pinned, executable, memorySize, timeout, encodingType, environment, accessSysfs}) {
     this.functions.push({
-      'Id': this.name + id,
+      'Id': `${this.name}-${id}`,
       'FunctionArn': functionArn,
       'FunctionConfiguration': {
         'Pinned': pinned || false,
