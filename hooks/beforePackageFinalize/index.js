@@ -18,6 +18,8 @@ module.exports = {
     // Add all functions
     const accountInfo = await this.provider.getAccountInfo()
     const defaultConfig = this.config.defaults || {}
+
+    this.logger.log('Loading functions...')
     this.serverless.service.getAllFunctions().forEach(functionName => {
       const functionObject = this.serverless.service.getFunction(functionName)
       const greengrassConfig = functionObject.greengrass || {}
@@ -47,7 +49,8 @@ module.exports = {
     const greengrassGroup = new GreengrassGroup({ provider: this.provider, groupId: this.config.groupId })
     const currentDefinition = await greengrassGroup.getCurrentDefinition()
 
-    // Create new definition versions (updating only function definition version AN)
+    // Create new definition versions (updating only function definition version ARN)
+    this.logger.log('Creating new Group Version...')
     const groupVersion = new GroupVersion({
       ...currentDefinition,
       groupId: this.config.groupId,

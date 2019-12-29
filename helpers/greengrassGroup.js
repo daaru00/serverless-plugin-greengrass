@@ -7,8 +7,9 @@ module.exports = class GreengrassGroup {
    *
    * @param {object} opts
    */
-  constructor({ provider, groupId }) {
+  constructor({ provider, logger, groupId }) {
     this.provider = provider
+    this.logger = logger
     this.groupId = groupId
   }
 
@@ -170,13 +171,16 @@ module.exports = class GreengrassGroup {
   /**
    * Wait until deploy is successfully completed
    * 
-   * @param {boolean}
+   * @param {number} timeout default 10
    */
   async waitUntilDeployComplete(timeout) {
     timeout = timeout || 10
     let currentStatus = null
     for (let wait = 0; wait < timeout; wait++) {
       await sleep()
+      if (this.logger) {
+        this.logger.progress()
+      }
       currentStatus = await this.getDeployStatus()
       if (currentStatus === 'Failure') {
         return false

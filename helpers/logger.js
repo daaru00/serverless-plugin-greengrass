@@ -61,4 +61,11 @@ module.exports = class Logger {
       color: 'red'
     })
   }
+
+  /**
+   * Show progress
+   */
+  progress () {
+    this.sls.cli.consoleLog('.')
+  }
 }

@@ -29,7 +29,7 @@ class Controller {
       this.logger.warn('Something goes wrong during Greengrass Group Version creation, cannot find ARN from CloudFormation Stack, deploy aborted.')
       return
     }
-    const greengrassGroup = new GreengrassGroup({ provider: this.provider, groupId: this.config.groupId })
+    const greengrassGroup = new GreengrassGroup({ provider: this.provider, groupId: this.config.groupId, logger: this.logger })
 
     // Check for version mismatch
     const currentGreoupVersionArn = await greengrassGroup.getCurrentVersionArn()
@@ -44,7 +44,8 @@ class Controller {
     await greengrassGroup.createDeployment(versionToDeploy.id)
 
     // Wait until deploy ends
-    const success = await greengrassGroup.waitDeployComplete()
+    this.logger.log(`Checking deploy ${versionToDeploy.id} progress...`)
+    const success = await greengrassGroup.waitUntilDeployComplete()
     if (success === false) {
       const error = await greengrassGroup.getDeployError()
       if (error === false) {
@@ -54,8 +55,6 @@ class Controller {
       }
       return
     }
-
-    this.logger.log(`Functions version ${versionToDeploy.id} successfully deployed!`)
   }
 }
 
