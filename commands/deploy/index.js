@@ -18,7 +18,7 @@ class Controller {
      * Execute hook
      */
   async execute () {
-    if (this.serverless.service.getAllFunctions().length === 0) {
+    if (!this.serverless || !this.serverless.service || this.serverless.service.getAllFunctions().length === 0) {
       return
     }
 

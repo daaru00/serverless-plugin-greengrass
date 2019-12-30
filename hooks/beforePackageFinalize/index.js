@@ -7,6 +7,9 @@ module.exports = {
    * Execute hook
    */
   async execute () {
+    if (!this.serverless.service){
+      return
+    }
     // Init properties
     this.cloudFormationTemplate = this.serverless.service.provider.compiledCloudFormationTemplate    
 
@@ -22,6 +25,18 @@ module.exports = {
     this.serverless.service.getAllFunctions().forEach(functionName => {
       const functionObject = this.serverless.service.getFunction(functionName)
       const greengrassConfig = functionObject.greengrass || {}
+
+      // Include functions
+      if (this.config.includes && Array.isArray(this.config.includes) && this.config.includes.includes(functionName) === false ) {
+        this.logger.log(`Function ${functionName} excluded by include`)
+        return
+      }
+      
+      // Exclude functions
+      if (this.config.exclude && Array.isArray(this.config.exclude) && this.config.exclude.includes(functionName) === true ) {
+        this.logger.log(`Function ${functionName} excluded by exclude`)
+        return
+      }
 
       // Add function
       functionDefinition.addFunction({
@@ -62,8 +77,8 @@ module.exports = {
       ...currentDefinition,
       groupId: this.config.groupId,
       functionDefinitionVersionArn: {
-        Ref: 'GreengrassFunctionDefinition' + this.config.coreName
-      },
+        'Fn::GetAtt': [ 'GreengrassFunctionDefinition' + this.config.coreName, 'LatestVersionArn' ]
+      }
     })
     this.cloudFormationTemplate.Resources['GreengrassGroupVersion'] = groupVersion.toCloudFormationObject()
     this.cloudFormationTemplate.Outputs['GreengrassGroupVersionArn'] = {
