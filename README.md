@@ -190,7 +190,7 @@ $ serverless greengrass deploy # will be printed a more verbose log
 
 ## Extra tips
 
-### Setup RaspberryPI
+### Setup Raspberry Pi
 
 1. Download latest version of Raspbian Lite version from [official download page](https://www.raspberrypi.org/downloads/raspbian/)
 2. Extract `.img` file from previously download zip archive
@@ -211,7 +211,7 @@ network={
 [source](https://raspberrypi.stackexchange.com/questions/10251/prepare-sd-card-for-wifi-on-headless-pi)
 
 6. Create a new empty file `ssh` without extensions in order to enable SSH service
-7. Insert SD card into RaspberryPI and boot it up
+7. Insert SD card into Raspberry Pi and boot it up
 8. Check into your modem info page a WiFi newly connected device called "raspberry" and get the IP
 9. Connect to Raspberry from your computer using SSH
 ```bash
