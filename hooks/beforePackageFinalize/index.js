@@ -62,6 +62,7 @@ module.exports = {
           functionObject.environment || {}
         ),
         accessSysfs: greengrassConfig.accessSysfs || defaultConfig.accessSysfs,
+        resources: [...(defaultConfig.resources || []), ...(greengrassConfig.resources || [])]
       })
     })
 

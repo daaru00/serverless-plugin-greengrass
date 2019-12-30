@@ -12,7 +12,23 @@ module.exports = class FunctionDefinition {
   /**
    * Add function
    */
-  addFunction({id, functionArn, pinned, executable, memorySize, timeout, encodingType, environment, accessSysfs}) {
+  addFunction({id, functionArn, pinned, executable, memorySize, timeout, encodingType, environment, accessSysfs, resources}) {
+    resources = resources || []
+    resources = resources.map(resource => {
+      const permissionSuffix = resource.substring(resource.length - 3)
+      let permission = 'ro'
+      switch (permissionSuffix) {
+      case ':ro':
+      case ':rw':
+        permission = resource.substring(resource.length - 2)
+        resource = resource.substring(0, resource.length - 3)
+        break
+      }
+      return {
+        'ResourceId': resource,
+        'Permission': permission
+      }
+    })
     this.functions.push({
       'Id': `${this.name}-${id}`,
       'FunctionArn': functionArn,
@@ -25,6 +41,7 @@ module.exports = class FunctionDefinition {
         'Environment': {
           'Variables': environment || {},
           'AccessSysfs': accessSysfs || false,
+          'ResourceAccessPolicies': resources
         }
       }
     })

@@ -40,6 +40,7 @@ functions:
   myfunction:
     handler: tasks/door.handler
 ```
+*(in order to retrieve group id got to AWS Console, then got to "IoT Greengrass" service, select the Greengrass Groups and under "Setting" menu you will find the "Group ID" section)*
 
 Advanced configuration:
 ```yaml
@@ -102,6 +103,26 @@ functions:
   myfunctionC:
     handler: tasks/door.handler
 ```
+
+Functions resources ids and permissions (locals / machine learning / secret):
+```yaml
+custom:
+  greengrass:
+    groupId: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+    defaults:
+      resources:
+        - xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx:ro # resource id with only read permission
+        - xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx # only, resource id, permission by default will be "ro"
+
+functions:
+  myfunctionA:
+    handler: tasks/door.handler
+    greengrass:
+      resources:
+        - xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx:rw # resource id with read and write permission
+```
+in order to retrieve the resource id got to AWS Console, then got to "IoT Greengrass" service, select the Greengrass Groups and under "Resources" menu you will find all available resources. Select resource you want to add and grab the last part of URL:
+`https://<your region>.console.aws.amazon.com/iot/home?region=<your region>#/greengrass/groups/<your group id>/resources/<resource id>`
 
 ### Deploy
 
