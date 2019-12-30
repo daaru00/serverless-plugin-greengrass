@@ -17,7 +17,7 @@ class ServerlessPlugin {
       greengrass: {
         commands: {
           deploy: commands.deploy.command,
-          reDeploy: commands.reDeploy.command,
+          redeploy: commands.redeploy.command,
           reset: commands.reset.command,
         }
       }
@@ -29,7 +29,7 @@ class ServerlessPlugin {
       'after:deploy:deploy': hooks.afterDeploy.execute.bind(this),
 
       'greengrass:deploy:execute': commands.deploy.controller.execute.bind(this),
-      'greengrass:reDeploy:execute': commands.reDeploy.controller.execute.bind(this),
+      'greengrass:redeploy:execute': commands.redeploy.controller.execute.bind(this),
       'greengrass:reset:execute': commands.reset.controller.execute.bind(this),
     }
   }

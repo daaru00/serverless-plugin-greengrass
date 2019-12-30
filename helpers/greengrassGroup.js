@@ -26,6 +26,7 @@ module.exports = class GreengrassGroup {
       GroupId: this.groupId
     })
     this.currentVersionId = response.LatestVersion
+    if (this.logger) this.logger.debug(`Version ID ${this.currentVersionId} loaded`)
     return this.currentVersionId
   }
 
@@ -46,6 +47,7 @@ module.exports = class GreengrassGroup {
       GroupVersionId: this.currentVersionId
     })
     this.currentVersionDetails = responseDetails
+    if (this.logger) this.logger.debug('Version details loaded')
     return this.currentVersionDetails
   }
 
@@ -58,6 +60,7 @@ module.exports = class GreengrassGroup {
     if (!this.currentVersionDetails) {
       await this.getCurrentVersionDetails()
     }
+    if (this.logger) this.logger.debug('Version ARN loaded')
     return this.currentVersionDetails.Arn
   }
 
@@ -71,6 +74,7 @@ module.exports = class GreengrassGroup {
       await this.getCurrentVersionDetails()
     }
     const currentDefinition = this.currentVersionDetails.Definition
+    if (this.logger) this.logger.debug('Current definition loaded')
     return {
       connectorDefinitionVersionArn: currentDefinition.ConnectorDefinitionVersionArn,
       coreDefinitionVersionArn: currentDefinition.CoreDefinitionVersionArn,
@@ -95,6 +99,7 @@ module.exports = class GreengrassGroup {
       GroupId: this.groupId
     })
     this.deployments = response.Deployments
+    if (this.logger) this.logger.debug(`${this.deployments.length} deployments loaded`)
     return this.deployments
   }
 
@@ -107,13 +112,14 @@ module.exports = class GreengrassGroup {
     if (this.latestDeploy) {
       return this.latestDeploy
     }
-    if (this.deployments) {
+    if (!this.deployments) {
       await this.listDeployments()
     }
     if (this.deployments.length === 0) {
       return false
     }
     this.latestDeploy = this.deployments[0]
+    if (this.logger) this.logger.debug(`Latest deploy ${this.latestDeploy.DeploymentId} loaded`)
     return {
       id: this.latestDeploy.DeploymentId
     }
@@ -134,6 +140,7 @@ module.exports = class GreengrassGroup {
       id: response.DeploymentId,
       arn: response.DeploymentArn
     }
+    if (this.logger) this.logger.debug(`Created deploy with id ${response.DeploymentId}`)
     return this.currentDeployment
   }
 
@@ -152,6 +159,7 @@ module.exports = class GreengrassGroup {
       id: response.DeploymentId,
       arn: response.DeploymentArn
     }
+    if (this.logger) this.logger.debug(`Created re-deploy with id ${response.DeploymentId}`)
     return this.currentDeployment
   }
 
@@ -165,22 +173,21 @@ module.exports = class GreengrassGroup {
       DeploymentId: this.currentDeployment.id,
       GroupId: this.groupId
     })
+    if (this.logger) this.logger.debug(`Deploy ${this.currentDeployment.id} is in status ${deployment.DeploymentStatus}`)
     return deployment.DeploymentStatus
   }
 
   /**
    * Wait until deploy is successfully completed
    * 
-   * @param {number} timeout default 10
+   * @param {number} timeout default 30
    */
   async waitUntilDeployComplete(timeout) {
-    timeout = timeout || 10
+    timeout = timeout || 30
     let currentStatus = null
     for (let wait = 0; wait < timeout; wait++) {
       await sleep()
-      if (this.logger) {
-        this.logger.progress()
-      }
+      if (this.logger) this.logger.progress()
       currentStatus = await this.getDeployStatus()
       if (currentStatus === 'Failure') {
         return false

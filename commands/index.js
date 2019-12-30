@@ -1,5 +1,5 @@
 const deployController = require('./deploy')
-const redeployController = require('./re-deploy')
+const redeployController = require('./redeploy')
 const resetController = require('./reset')
 
 module.exports = {
@@ -7,7 +7,7 @@ module.exports = {
     command: deployController.description,
     controller: deployController
   },
-  reDeploy: {
+  redeploy: {
     command: redeployController.description,
     controller: redeployController
   },

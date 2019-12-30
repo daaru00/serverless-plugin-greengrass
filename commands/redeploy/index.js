@@ -22,7 +22,7 @@ class Controller {
     }
 
     // Load latest deployments
-    const greengrassGroup = new GreengrassGroup({ provider: this.provider, groupId: this.config.groupId })
+    const greengrassGroup = new GreengrassGroup({ provider: this.provider, groupId: this.config.groupId, logger: this.logger })
     const latestDeploy = await greengrassGroup.getLatestDeploy()
     if (!latestDeploy) {
       this.logger.warn('No deployment found for Greengrass Group, re-deploy aborted.')
@@ -34,7 +34,8 @@ class Controller {
     await greengrassGroup.executeRedeploy(latestDeploy.id)
 
     // Wait until deploy ends
-    const success = await greengrassGroup.waitDeployComplete()
+    this.logger.log('Checking deploy progress...')
+    const success = await greengrassGroup.waitUntilDeployComplete()
     if (success === false) {
       const error = await greengrassGroup.getDeployError()
       if (error === false) {

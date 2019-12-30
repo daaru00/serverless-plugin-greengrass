@@ -66,6 +66,8 @@ module.exports = class Logger {
    * Show progress
    */
   progress () {
-    this.sls.cli.consoleLog('.')
+    if (this.debugEnabled === true) return
+    
+    process.stdout.write('.')
   }
 }

@@ -22,15 +22,15 @@ class Controller {
     }
 
     // Load latest deployments
-    const greengrassGroup = new GreengrassGroup({ provider: this.provider, groupId: this.config.groupId })
-    const latestDeploy = await greengrassGroup.resetDeployment()
+    const greengrassGroup = new GreengrassGroup({ provider: this.provider, groupId: this.config.groupId, logger: this.logger })
 
-    // Execute redeploy
-    this.logger.log(`Execute redeployment for deploy ${latestDeploy.id}...`)
-    await greengrassGroup.createDeployment(latestDeploy.id)
+    // Execute reset
+    this.logger.log(`Execute reset for group id ${this.config.groupId}...`)
+    await greengrassGroup.resetDeployment()
 
     // Wait until deploy ends
-    const success = await greengrassGroup.waitDeployComplete()
+    this.logger.log('Checking reset progress...')
+    const success = await greengrassGroup.waitUntilDeployComplete()
     if (success === false) {
       const error = await greengrassGroup.getDeployError()
       if (error === false) {
@@ -41,7 +41,7 @@ class Controller {
       return
     }
 
-    this.logger.log(`Redeploy of deploy ${latestDeploy.id} successfully executed!`)
+    this.logger.log('Reset successfully executed!')
   }
 }
 

@@ -68,7 +68,7 @@ module.exports = {
     this.cloudFormationTemplate.Resources['GreengrassFunctionDefinition' + this.config.coreName ] = functionDefinition.toCloudFormationObject()
 
     // Get current definition version
-    const greengrassGroup = new GreengrassGroup({ provider: this.provider, groupId: this.config.groupId })
+    const greengrassGroup = new GreengrassGroup({ provider: this.provider, groupId: this.config.groupId, logger: this.logger })
     const currentDefinition = await greengrassGroup.getCurrentDefinition()
 
     // Create new definition versions (updating only function definition version ARN)
