@@ -110,34 +110,34 @@ functions:
 
 Execute a simple Serverless deploy, with `autoDeploy` enabled:
 ```bash
-serverless deploy
+$ serverless deploy
 ```
 
 Manually execute deploy, with `autoDeploy` disabled: 
 ```bash
-serverless deploy
-serverless greengrass deploy
+$ serverless deploy
+$ serverless greengrass deploy
 ```
 
 ### Redeploy
 
 To redeploy latest version run:
 ```bash
-serverless greengrass redeploy
+$ serverless greengrass redeploy
 ```
 
 ### Delete/Reset
 
 Execute a simple Serverless remove, with `autoDeploy` enabled:
 ```bash
-serverless remove
+$ serverless remove
 ```
 this will also run a reset deployment operations against Greengrass group.
 
 Manually execute reset, with `autoDeploy` disabled: 
 ```bash
-serverless remove
-serverless greengrass reset
+$ serverless remove
+$ serverless greengrass reset
 ```
 
 ## Extra tips
