@@ -7,15 +7,16 @@ module.exports = {
    * Execute hook
    */
   async execute () {
-    if (!this.serverless.service){
+    if (this.validator.check() === false) {
       return
     }
+
     // Init properties
     this.cloudFormationTemplate = this.serverless.service.provider.compiledCloudFormationTemplate    
 
     // Create functions definition for core
     const functionDefinition = new FunctionDefinition({
-      name: `${this.service.service}-${this.providerConfig.stage}-${this.config.coreName}`
+      name: `${this.service.service}-${this.providerConfig.stage}`
     })
 
     // Add all functions
@@ -65,7 +66,7 @@ module.exports = {
     })
 
     // Add Greengrass Function Definition to CloudFormation template
-    this.cloudFormationTemplate.Resources['GreengrassFunctionDefinition' + this.config.coreName ] = functionDefinition.toCloudFormationObject()
+    this.cloudFormationTemplate.Resources['GreengrassFunctionDefinition'] = functionDefinition.toCloudFormationObject()
 
     // Get current definition version
     const greengrassGroup = new GreengrassGroup({ provider: this.provider, groupId: this.config.groupId, logger: this.logger })
@@ -77,7 +78,7 @@ module.exports = {
       ...currentDefinition,
       groupId: this.config.groupId,
       functionDefinitionVersionArn: {
-        'Fn::GetAtt': [ 'GreengrassFunctionDefinition' + this.config.coreName, 'LatestVersionArn' ]
+        'Fn::GetAtt': [ 'GreengrassFunctionDefinition', 'LatestVersionArn' ]
       }
     })
     this.cloudFormationTemplate.Resources['GreengrassGroupVersion'] = groupVersion.toCloudFormationObject()

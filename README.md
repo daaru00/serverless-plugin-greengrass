@@ -8,7 +8,7 @@ This plugin will create a new [AWS::Greengrass::FunctionDefinition](https://docs
 
 ## Requirements
 
-Create a Greengrass Group and a Core and configure your device to connect to it.
+Create a Greengrass Group and a Greengrass Core and configure your device to connect to it.
 
 ## Usage
 
@@ -34,7 +34,6 @@ Minimal required configuration:
 ```yaml
 custom:
   greengrass:
-    coreName: MyCoreThingName # name of the Core's Thing
     groupId: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx # Greengrass Group id
 
 functions:
@@ -47,7 +46,7 @@ Advanced configuration:
 custom:
   greengrass:
     autoDeploy: true # set to "false" to disable automatic deploy after "sls deploy"
-    coreName: MyCoreThingName
+    deployTimeout: 30 # deploy timeouts in seconds, default 30
     groupId: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
     defaults:
       pinned: false # check if is a long running or on-demand
@@ -74,7 +73,6 @@ Include only specific functions:
 ```yaml
 custom:
   greengrass:
-    coreName: MyCoreThingName
     groupId: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
     include:
       - myfunctionA # Only function "myfunctionA" will be deployed to Greengrass
@@ -92,7 +90,6 @@ Exclude functions:
 ```yaml
 custom:
   greengrass:
-    coreName: MyCoreThingName
     groupId: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
     exclude:
       - myfunctionB # Only function "myfunctionA" and "myfunctionC" will be deployed to Greengrass
@@ -109,11 +106,43 @@ functions:
 ### Deploy
 
 Execute a simple Serverless deploy, with `autoDeploy` enabled:
+```yaml
+custom:
+  greengrass:
+    autoDeploy: true # or leave empty
+```
 ```bash
 $ serverless deploy
 ```
+```
+Serverless: Packaging service...
+Serverless: Excluding development dependencies...
+Greengrass: Loading functions...               # <--- here plugin will load functions configurations
+Greengrass: Creating new Group Version...      # <--- here add a new Group Version to CloudFormation template
+Serverless: Uploading CloudFormation file to S3...
+Serverless: Uploading artifacts...
+Serverless: Uploading service example.zip file to S3 (2.42 MB)...
+Serverless: Validating template...
+Serverless: Updating Stack...
+Serverless: Checking Stack update progress...
+.........................                      # <--- wait until CloudFormation Stack is deployed
+Serverless: Stack update finished...
+Service Information
+                                               # <--- here your service information
+Serverless: Removing old service artifacts from S3...
+Serverless: Run the "serverless" command to setup monitoring, troubleshooting and testing. # <--- here Serverless deploys ends
+Greengrass: Creating new deployment for version xxxxxxxxxx... # <--- here plugin will execute a Greengrass deploy
+Greengrass: Checking deploy progress...
+.........................                      # <--- wait until Greengrass deploy is completed
+Greengrass: Deploy successfully executed.      # <--- all functions are deployed to your Greengrass Group
+```
 
 Manually execute deploy, with `autoDeploy` disabled: 
+```yaml
+custom:
+  greengrass:
+    autoDeploy: false
+```
 ```bash
 $ serverless deploy
 $ serverless greengrass deploy
@@ -129,16 +158,41 @@ $ serverless greengrass redeploy
 ### Delete/Reset
 
 Execute a simple Serverless remove, with `autoDeploy` enabled:
+```yaml
+custom:
+  greengrass:
+    autoDeploy: true # or leave empty
+```
 ```bash
 $ serverless remove
 ```
 this will also run a reset deployment operations against Greengrass group.
 
-Manually execute reset, with `autoDeploy` disabled: 
+Manually execute reset, with `autoDeploy` disabled:
+```yaml
+custom:
+  greengrass:
+    autoDeploy: false
+```
 ```bash
 $ serverless remove
 $ serverless greengrass reset
 ```
+
+## Debug
+
+Set `DEBUG` environment variable to "yes" to enable debug log:
+```bash
+export DEBUG=yes
+
+$ serverless greengrass deploy # will be printed a more verbose log
+```
+
+## TODO
+
+- [ ] Deploy to multiple Greengrass Groups
+- [ ] Allow to add different Lambda Version to the same Function Definition
+- [ ] Allow to create and provision a new Greengrass Groups
 
 ## Extra tips
 

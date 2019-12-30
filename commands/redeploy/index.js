@@ -17,7 +17,7 @@ class Controller {
      * Execute hook
      */
   async execute () {
-    if (this.serverless.service.getAllFunctions().length === 0) {
+    if (this.validator.check() === false) {
       return
     }
 
@@ -35,7 +35,7 @@ class Controller {
 
     // Wait until deploy ends
     this.logger.log('Checking deploy progress...')
-    const success = await greengrassGroup.waitUntilDeployComplete()
+    const success = await greengrassGroup.waitUntilDeployComplete(this.config.deployTimeout)
     if (success === false) {
       const error = await greengrassGroup.getDeployError()
       if (error === false) {
@@ -46,7 +46,7 @@ class Controller {
       return
     }
 
-    this.logger.log(`Redeploy of deploy ${latestDeploy.id} successfully executed!`)
+    this.logger.log(`Redeploy of deploy ${latestDeploy.id} successfully executed.`)
   }
 }
 

@@ -2,6 +2,7 @@ const _ = require('lodash')
 const hooks = require('./hooks')
 const commands = require('./commands')
 const Logger = require('./helpers/logger')
+const Validator = require('./helpers/validator')
 
 class ServerlessPlugin {
   constructor (serverless, options) {
@@ -12,9 +13,11 @@ class ServerlessPlugin {
     this.providerConfig = this.serverless.service.provider
     this.service = this.serverless.service
     this.logger = new Logger(this.serverless)
+    this.validator = new Validator(this.serverless, this.config, this.logger)
     
     this.commands = {
       greengrass: {
+        type: 'entrypoint',
         commands: {
           deploy: commands.deploy.command,
           redeploy: commands.redeploy.command,
@@ -25,8 +28,8 @@ class ServerlessPlugin {
 
     this.hooks = {
       'before:package:finalize': hooks.beforePackageFinalize.execute.bind(this),
+      'deploy:finalize': hooks.afterDeploy.execute.bind(this),
       'before:remove:remove': hooks.beforeRemove.execute.bind(this),
-      'after:deploy:deploy': hooks.afterDeploy.execute.bind(this),
 
       'greengrass:deploy:execute': commands.deploy.controller.execute.bind(this),
       'greengrass:redeploy:execute': commands.redeploy.controller.execute.bind(this),
