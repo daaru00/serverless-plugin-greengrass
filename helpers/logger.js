@@ -2,11 +2,11 @@ module.exports = class Logger {
   /**
    * Constructor
    *
-   * @param {object} sls
+   * @param {object} serverless
    * @param {string} serviceName
    */
-  constructor (sls, serviceName) {
-    this.sls = sls
+  constructor (serverless, serviceName) {
+    this.serverless = serverless
     this.serviceName = serviceName || 'Greengrass'
     this.debugEnabled = process.env.DEBUG === 'yes'
   }
@@ -17,7 +17,7 @@ module.exports = class Logger {
    * @param {string} msg
    */
   log (msg, opts) {
-    this.sls.cli.log(msg, this.serviceName, {
+    this.serverless.cli.log(msg, this.serviceName, {
       color: 'yellow',
       bold: false,
       ...opts
@@ -69,5 +69,14 @@ module.exports = class Logger {
     if (this.debugEnabled === true) return
     
     process.stdout.write('.')
+  }
+
+  /**
+   * Print newline
+   */
+  newLine () {
+    if (this.debugEnabled === true) return
+    
+    this.serverless.cli.consoleLog('')
   }
 }

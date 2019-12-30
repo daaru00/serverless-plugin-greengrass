@@ -51,23 +51,21 @@ custom:
     groupId: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
     defaults:
       pinned: false # check if is a long running or on-demand
-      memory: 16384,  # 16 MB expressed in KB
+      memorySize: 16384,  # 16 MB expressed in KB
       timeout: 6 # function timeout
       encodingType: json # The expected encoding type of the input payload, can be binary or json.
       accessSysfs: false # allowed to access the host's /sys folder
       environment: 
-        myVarA: 'myValueA' # deployed for all Greengrass functions
+        myVarA: 'myValueA' # deployed to Greengrass for all functions
     
 functions:
   myfunction:
     handler: tasks/door.handler
-    environment: 
-      myVarB: 'myValueB' # only deployed for this function (even for Greengrass)
     greengrass:
       handler: tasks/door.handlerIot # override handler for Greengrass deployed function
       pinned: true # override default values
       environment: 
-        myVarC: 'myValueC' # only deployed to Greengrass
+        myVarC: 'myValueC' # deployed to Greengrass only for this function
 ```
 
 Include only specific functions:

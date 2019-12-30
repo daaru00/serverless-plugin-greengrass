@@ -15,8 +15,9 @@ module.exports = {
     this.cloudFormationTemplate = this.serverless.service.provider.compiledCloudFormationTemplate    
 
     // Create functions definition for core
+    const providerConfig = this.providerConfig || {}
     const functionDefinition = new FunctionDefinition({
-      name: `${this.service.service}-${this.providerConfig.stage}`
+      name: `${this.service.service}-${providerConfig.stage}`
     })
 
     // Add all functions
@@ -53,13 +54,12 @@ module.exports = {
         },
         pinned: greengrassConfig.pinned || defaultConfig.pinned,
         executable: greengrassConfig.handler || functionObject.handler,
-        memorySize: greengrassConfig.memory || defaultConfig.memory || functionObject.memory,
+        memorySize: greengrassConfig.memorySize || defaultConfig.memorySize || functionObject.memory,
         timeout: greengrassConfig.timeout || defaultConfig.timeout || functionObject.timeout,
         encodingType: greengrassConfig.encodingType || defaultConfig.encodingType,
         environment: Object.assign(
           greengrassConfig.environment || {},
-          defaultConfig.environment || {},
-          functionObject.environment || {}
+          defaultConfig.environment || {}
         ),
         accessSysfs: greengrassConfig.accessSysfs || defaultConfig.accessSysfs,
         resources: [...(defaultConfig.resources || []), ...(greengrassConfig.resources || [])]

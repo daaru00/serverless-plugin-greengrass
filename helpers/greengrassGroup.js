@@ -190,12 +190,15 @@ module.exports = class GreengrassGroup {
       if (this.logger) this.logger.progress()
       currentStatus = await this.getDeployStatus()
       if (currentStatus === 'Failure') {
+        if (this.logger) this.logger.newLine()
         return false
       }
       if (currentStatus === 'Success') {
+        if (this.logger) this.logger.newLine()
         return true
       }
     }
+    if (this.logger) this.logger.newLine()
     return false
   }
 
