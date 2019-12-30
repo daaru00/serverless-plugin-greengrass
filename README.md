@@ -188,12 +188,6 @@ export DEBUG=yes
 $ serverless greengrass deploy # will be printed a more verbose log
 ```
 
-## TODO
-
-- [ ] Deploy to multiple Greengrass Groups
-- [ ] Allow to add different Lambda Version to the same Function Definition
-- [ ] Allow to create and provision a new Greengrass Groups
-
 ## Extra tips
 
 ### Setup RaspberryPI
@@ -235,3 +229,9 @@ wget -q -O ./gg-device-setup-latest.sh https://d1onfpft10uf5o.cloudfront.net/gre
 [source](https://docs.aws.amazon.com/greengrass/latest/developerguide/quick-start.html)
 
 12. Automatically starting AWS Greengrass on a Raspberry Pi on system boot using [this guide](http://www.andyfrench.info/2018/08/automatically-starting-aws-greengrass.html)
+
+## TODO
+
+- [ ] Deploy to multiple Greengrass Groups
+- [ ] Allow to add different Lambda Version to the same Function Definition
+- [ ] Allow to create and provision a new Greengrass Groups
