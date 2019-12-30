@@ -1,7 +1,7 @@
 {
   "name": "serverless-plugin-greengrass",
   "version": "1.0.0",
-  "description": "Serverless plugin to deploy Greengrass functions",
+  "description": "Serverless plugin to deploy functions to Greengrass Group",
   "main": "index.js",
   "repository": {
     "type": "git",
