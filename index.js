@@ -17,7 +17,6 @@ class ServerlessPlugin {
     
     this.commands = {
       greengrass: {
-        type: 'entrypoint',
         commands: {
           deploy: commands.deploy.command,
           redeploy: commands.redeploy.command,
