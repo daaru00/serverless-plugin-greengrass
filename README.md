@@ -250,6 +250,7 @@ wget -q -O ./gg-device-setup-latest.sh https://d1onfpft10uf5o.cloudfront.net/gre
 
 ## TODO
 
-- [ ] Deploy to multiple Greengrass Groups
-- [ ] Allow to add different Lambda Version to the same Function Definition
 - [ ] Allow to create and provision a new Greengrass Groups
+- [ ] Deploy to multiple Greengrass Groups
+- [ ] Add Greengrass Groups Subscription support
+- [ ] Allow to use resource name instead of id (separated by local, machine learning and secret)
