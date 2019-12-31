@@ -27,7 +27,7 @@ class ServerlessPlugin {
 
     this.hooks = {
       'before:package:finalize': hooks.beforePackageFinalize.execute.bind(this),
-      'deploy:finalize': hooks.afterDeploy.execute.bind(this),
+      'after:deploy:deploy': hooks.afterDeploy.execute.bind(this),
       'before:remove:remove': hooks.beforeRemove.execute.bind(this),
 
       'greengrass:deploy:execute': commands.deploy.controller.execute.bind(this),
