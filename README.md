@@ -95,11 +95,11 @@ custom:
 
 functions:
   myfunctionA:
-    handler: tasks/door.handler
+    handler: functions/myfunctionA.handler
   myfunctionB:
-    handler: tasks/door.handler
+    handler: functions/myfunctionB.handler
   myfunctionC:
-    handler: tasks/door.handler
+    handler: functions/myfunctionC.handler
 ```
 
 Functions resources ids and permissions (locals / machine learning / secret):
@@ -108,7 +108,7 @@ custom:
   greengrass:
     groupId: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
     defaults:
-      resources:
+      resources: # available for all functions
         - xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx:ro # resource id with only read permission
         - xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx # only, resource id, permission by default will be "ro"
 
@@ -121,6 +121,40 @@ functions:
 ```
 in order to retrieve the resource id got to AWS Console, then got to "IoT Greengrass" service, select the Greengrass Groups and under "Resources" menu you will find all available resources. Select resource you want to add and grab the last part of URL:
 `https://<your region>.console.aws.amazon.com/iot/home?region=<your region>#/greengrass/groups/<your group id>/resources/<resource id>`
+
+Subscription management:
+```yaml
+custom:
+  greengrass:
+    groupId: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+    subscriptions: # global subscription
+      - source: arn:aws:iot:us-east-1:123456789012:thing/MyLightBulb # a Lambda function ARN, a connector ARN, "cloud" or "GGShadowService"
+        target: arn:aws:greengrass:us-east-1::/connectors/TwilioNotifications/versions/3
+        subject: /test/topic/
+
+functions:
+  myfunctionA:
+    handler: functions/myfunctionA.handler
+    greengrass:
+      subscriptions: # leave target empty to use current function arn
+        - source: "GGShadowService"
+          subject: /test/topic/
+  myfunctionB:
+    handler: functions/myfunctionB.handler
+    greengrass:
+      subscriptions: # leave source empty to use current function arn
+        - target: arn:aws:iot:us-east-1:123456789012:thing/MyLightBulb
+          subject: /test/topic/
+  myfunctionC:
+    handler: functions/myfunctionC.handler
+    greengrass:
+      subscriptions: # multiple subscription types are supported
+        - source: arn:partition:service:region:account-id:resource-id
+          subject: /test/topic/a/
+        - target: "cloud"
+          subject: /test/topic/b/
+```
+For more info about subscription value check [AWS documentation](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-greengrass-subscriptiondefinition-subscription.html#cfn-greengrass-subscriptiondefinition-subscription-target).
 
 ### Deploy
 
@@ -252,5 +286,5 @@ wget -q -O ./gg-device-setup-latest.sh https://d1onfpft10uf5o.cloudfront.net/gre
 
 - [ ] Allow to create and provision a new Greengrass Groups
 - [ ] Deploy to multiple Greengrass Groups
-- [ ] Add Greengrass Groups Subscription support
+- [X] Add Greengrass Groups Subscription support
 - [ ] Allow to use resource name instead of id (separated by local, machine learning and secret)

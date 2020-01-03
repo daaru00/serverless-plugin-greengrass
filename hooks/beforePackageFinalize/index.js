@@ -1,6 +1,7 @@
 const GreengrassGroup = require('../../helpers/greengrassGroup')
 const GroupVersion = require('../../helpers/resources/groupVersion')
 const FunctionDefinition = require('../../helpers/resources/functionDefinition')
+const SubscriptionDefinition = require('../../helpers/resources/subscriptionDefinition')
 
 module.exports = {
   /**
@@ -12,46 +13,80 @@ module.exports = {
     }
 
     // Init properties
-    this.cloudFormationTemplate = this.serverless.service.provider.compiledCloudFormationTemplate    
+    this.cloudFormationTemplate = this.serverless.service.provider.compiledCloudFormationTemplate
 
-    // Create functions definition for core
+    // Create functions and subscription definition for core
     const providerConfig = this.providerConfig || {}
     const functionDefinition = new FunctionDefinition({
       name: `${this.service.service}-${providerConfig.stage}`
     })
+    const subscriptionDefinition = new SubscriptionDefinition({
+      name: `${this.service.service}-${providerConfig.stage}`
+    })
+
+    // Add global subscriptions
+    if (this.config.subscriptions && Array.isArray(this.config.subscriptions)) {
+      this.config.subscriptions.forEach((subscription, index) => {
+        this.logger.log('Adding global subscriptions...')
+        subscriptionDefinition.addSubscription({
+          id: this.config.groupId+index,
+          sourceArn: subscription.source, 
+          targetArn: subscription.target, 
+          subject: subscription.subject
+        })
+      })
+    }
 
     // Add all functions
     const defaultConfig = this.config.defaults || {}
-
     this.logger.log('Loading functions...')
     this.serverless.service.getAllFunctions().forEach(functionName => {
+      // Load function data
       const functionObject = this.serverless.service.getFunction(functionName)
+      const functionArn = {
+        'Fn::Join': [
+          ':',
+          [
+            { 'Fn::GetAtt': [this.provider.naming.getLambdaLogicalId(functionName), 'Arn'] },
+            { 'Fn::GetAtt': [functionObject.versionLogicalId, 'Version'] }
+          ]
+        ]
+      }
       const greengrassConfig = functionObject.greengrass || {}
 
       // Include functions
-      if (this.config.includes && Array.isArray(this.config.includes) && this.config.includes.includes(functionName) === false ) {
+      if (this.config.includes && Array.isArray(this.config.includes) && this.config.includes.includes(functionName) === false) {
         this.logger.log(`Function ${functionName} excluded by include`)
         return
       }
-      
+
       // Exclude functions
-      if (this.config.exclude && Array.isArray(this.config.exclude) && this.config.exclude.includes(functionName) === true ) {
+      if (this.config.exclude && Array.isArray(this.config.exclude) && this.config.exclude.includes(functionName) === true) {
         this.logger.log(`Function ${functionName} excluded by exclude`)
         return
+      }
+
+      // Add subscription
+      if (greengrassConfig.subscriptions && Array.isArray(greengrassConfig.subscriptions)) {
+        greengrassConfig.subscriptions.forEach((subscription, index) => {
+          if (!subscription.target) {
+            subscription.target = functionArn
+          } else if (!subscription.source) {
+            subscription.source = functionArn
+          }
+          subscriptionDefinition.addSubscription({
+            id: functionName+index,
+            sourceArn: subscription.source, 
+            targetArn: subscription.target, 
+            subject: subscription.subject
+          })
+        })
       }
 
       // Add function
       functionDefinition.addFunction({
         id: functionName,
-        functionArn: {
-          'Fn::Join': [
-            ':',
-            [
-              {'Fn::GetAtt': [ this.provider.naming.getLambdaLogicalId(functionName), 'Arn' ]},
-              {'Fn::GetAtt': [ functionObject.versionLogicalId, 'Version' ]}
-            ]
-          ]
-        },
+        functionArn,
         pinned: greengrassConfig.pinned || defaultConfig.pinned,
         executable: greengrassConfig.handler || functionObject.handler,
         memorySize: greengrassConfig.memorySize || defaultConfig.memorySize || functionObject.memory,
@@ -68,6 +103,11 @@ module.exports = {
 
     // Add Greengrass Function Definition to CloudFormation template
     this.cloudFormationTemplate.Resources['GreengrassFunctionDefinition'] = functionDefinition.toCloudFormationObject()
+    this.logger.log('Creating new Function Definition Version...')
+
+    // Add Greengrass Subscription Definition to CloudFormation template
+    this.cloudFormationTemplate.Resources['GreengrassSubscriptionDefinition'] = subscriptionDefinition.toCloudFormationObject()
+    this.logger.log('Creating new Subscription Definition Version...')
 
     // Get current definition version
     const greengrassGroup = new GreengrassGroup({ provider: this.provider, groupId: this.config.groupId, logger: this.logger })
@@ -79,7 +119,10 @@ module.exports = {
       ...currentDefinition,
       groupId: this.config.groupId,
       functionDefinitionVersionArn: {
-        'Fn::GetAtt': [ 'GreengrassFunctionDefinition', 'LatestVersionArn' ]
+        'Fn::GetAtt': ['GreengrassFunctionDefinition', 'LatestVersionArn']
+      },
+      subscriptionDefinitionVersionArn: {
+        'Fn::GetAtt': ['GreengrassSubscriptionDefinition', 'LatestVersionArn']
       }
     })
     this.cloudFormationTemplate.Resources['GreengrassGroupVersion'] = groupVersion.toCloudFormationObject()
