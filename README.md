@@ -4,7 +4,10 @@
 
 A [serverless](https://serverless.com) plugin to deploy functions to Greengrass Group.
 
-This plugin will create a new [AWS::Greengrass::FunctionDefinition](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-greengrass-functiondefinition-function.html) with project's Lambdas declared. It will also create a new [AWS::Greengrass::GroupVersion](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-greengrass-groupversion.html) to associate the new Function Definition with your existing Greengrass Group. Deploy phase will trigger a new deployment with the new Group Version declared.
+This plugin will create: 
+- New [AWS::Greengrass::FunctionDefinition](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-greengrass-functiondefinition-function.html) with project's Lambdas declared. 
+- New [AWS::Greengrass::SubscriptionDefinition](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-greengrass-subscriptiondefinition-subscription.html) with project's events subscriptions. 
+- New [AWS::Greengrass::GroupVersion](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-greengrass-groupversion.html) to associate the new Function Definition with your existing Greengrass Group. Deploy phase will trigger a new deployment with the new Group Version declared.
 
 ## Requirements
 
