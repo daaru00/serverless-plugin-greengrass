@@ -84,12 +84,17 @@ module.exports = {
       }
 
       // Add function
+      let memorySize = greengrassConfig.memorySize || defaultConfig.memorySize || (functionObject.memory * 1024)
+      if (memorySize < 2048) {
+        this.logger.warn(`Function ${functionName} has an invalid memorySize value (${memorySize}), must be expressed in KB and greater or equal to 2048 (2MB)`)
+        memorySize = null // empty variable, will use default value
+      }
       functionDefinition.addFunction({
         id: functionName,
         functionArn,
         pinned: greengrassConfig.pinned || defaultConfig.pinned,
         executable: greengrassConfig.handler || functionObject.handler,
-        memorySize: greengrassConfig.memorySize || defaultConfig.memorySize || functionObject.memory,
+        memorySize,
         timeout: greengrassConfig.timeout || defaultConfig.timeout || functionObject.timeout,
         encodingType: greengrassConfig.encodingType || defaultConfig.encodingType,
         environment: Object.assign(
@@ -113,7 +118,7 @@ module.exports = {
     const greengrassGroup = new GreengrassGroup({ provider: this.provider, groupId: this.config.groupId, logger: this.logger })
     const currentDefinition = await greengrassGroup.getCurrentDefinition()
 
-    // Create new definition versions (updating only function definition version ARN)
+    // Create new definition versions (updating only function definition version ARN and subscriptions)
     this.logger.log('Creating new Group Version...')
     const groupVersion = new GroupVersion({
       ...currentDefinition,

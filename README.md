@@ -70,6 +70,8 @@ functions:
       environment: 
         myVarC: 'myValueC' # deployed to Greengrass only for this function
 ```
+Please note: `memorySize` must be expressed in KB (unlike normal Lambdas expressed in MB) and greater or equal to 2048 (2MB). For more infos check [FunctionConfiguration documentation](https://docs.aws.amazon.com/greengrass/latest/apireference/definitions-functionconfiguration.html).
+
 
 Include only specific functions:
 ```yaml

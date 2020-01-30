@@ -35,7 +35,7 @@ module.exports = class FunctionDefinition {
       'FunctionConfiguration': {
         'Pinned': pinned || false,
         'Executable': executable,
-        'MemorySize': memorySize || 1024,  // default 1 MB, expressed in KB
+        'MemorySize': memorySize || 131072,  // default 128 MB, expressed in KB
         'Timeout': timeout || 6, // 6 seconds
         'EncodingType': encodingType || 'json', // binary | json
         'Environment': {
